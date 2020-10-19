@@ -1,0 +1,12 @@
+* {
+  background-color: aquamarine;
+}
+#canvas {
+  background-color: chartreuse;
+  color: black;
+}
+#button {
+  height: 50px;
+  width: 50px;
+  background-color: cornflowerblue;
+}

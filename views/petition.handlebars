@@ -1,0 +1,19 @@
+
+  <h1>petition</h1>
+  <h3>your signature helps - build a better tomorrow</h3>
+
+<div>
+  <form method="POST">
+    <input name="first">
+    <input name="last">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <canvas id="canvas" width="200" height="100"><input type="hidden" name="sig" id="sig"></canvas>
+    <input type="submit" id="button" placeholder="submit">
+  </form>
+</div>
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}
+
