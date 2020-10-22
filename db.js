@@ -1,7 +1,10 @@
 // sudo service postgresql start - ovom komandom pokreni psql
 var spicedPg = require("spiced-pg");
 // var db = spicedPg("postgres:root:postgres@localhost:5432/signatures");
-var db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+const db = spicedPg(
+  process.env.DATABASE_URL ||
+    "postgres:postgres:postgres@localhost:5432/petition"
+);
 module.exports.addSignature = (signature) => {
   const q = `INSERT INTO signatures (sig)
             VALUES ($1)

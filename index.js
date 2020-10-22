@@ -164,7 +164,7 @@ app.get("/thankyou", (req, res) => {
   res.render("thankyou");
 });
 
-app.listen(8080, () => console.log("szervusz server"));
+app.listen(process.env.PORT || 8080, () => console.log("hi server"));
 
 //b to e - binary to encoding (?)
 
