@@ -1,0 +1,15 @@
+<h1>please log back in. this website misses you terribly</h1>
+<div>
+  <form method="POST">
+    <input name="email">
+    <input type="password" name="password" id="pw">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    {{!-- <canvas id="canvas" width="200" height="100"><input type="hidden" name="sig" id="sig"></canvas> --}}
+    <button id="login-button">log in</button>
+  </form>
+</div>
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}

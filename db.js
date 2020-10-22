@@ -24,9 +24,19 @@ module.exports.getPass = (email) => {
   return db.query(q, params);
 };
 
+module.exports.userInfo = (age, city, url) => {
+  const q = `INSERT INTO user_profiles(age, city, url)
+              VALUES($1, $2, $3)
+              RETURNING *`;
+  const params = [age, city, url];
+  return db.query(q, params);
+};
+
 // onda s time mailom u db.js napises query koji ti vraca id i password
 // od user where email je jednak onome sto si mu dao kao argument
 
 // sequel injection
 // INSERT INTO signatures (first, last, sig) VALUES ($1, $2, $3);
 // RETURNING first, last, id; (id generated when something inserted)
+
+//

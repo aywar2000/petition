@@ -1,0 +1,19 @@
+<h1>world without you is possible</h1>
+<h2>please register here</h2>
+<div>
+  <form method="POST">
+    <input name="first" placeholder="first name">
+    <input name="last"placeholder="last name">
+    <input name="email" placeholder="e-mail">
+    <input type="password" name="password" id="pw" placeholder="password">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <button id="reg-button">join</button>
+  </form>
+</div>
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}
+
+
