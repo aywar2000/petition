@@ -5,11 +5,11 @@ const db = spicedPg(
   process.env.DATABASE_URL ||
     "postgres:postgres:postgres@localhost:5432/petition"
 );
-module.exports.addSignature = (signature) => {
-  const q = `INSERT INTO signatures (sig)
-            VALUES ($1)
+module.exports.addSignature = (sig, user_id) => {
+  const q = `INSERT INTO signatures (sig, user_id)
+            VALUES ($1, $2)
             RETURNING *`;
-  const params = [sig];
+  const params = [sig, user_id];
   return db.query(q, params);
 };
 
@@ -27,11 +27,41 @@ module.exports.getPass = (email) => {
   return db.query(q, params);
 };
 
-module.exports.userInfo = (age, city, url) => {
-  const q = `INSERT INTO user_profiles(age, city, url)
-              VALUES($1, $2, $3)
+module.exports.userInfo = (age, city, url, userId) => {
+  const q = `INSERT INTO user_profiles(age, city, url, user_id)
+              VALUES($1, $2, $3, $4)
               RETURNING *`;
-  const params = [age, city, url];
+  const params = [age, city, url, userId];
+  return db.query(q, params);
+};
+
+module.exports.getSignature = (userId) => {
+  const q = `SELECT * FROM users
+              JOIN signatures
+              ON signatures.user_id = users.id
+              WHERE $1 = users.id`;
+  const params = [userId];
+  return db.query(q, params);
+};
+
+module.exports.listTable = () => {
+  return db.query(
+    `SELECT * FROM users
+    JOIN signatures
+    ON signatures.user_id = users.id
+    JOIN user_profiles
+    ON user_profiles.user_id = users.id`
+  );
+};
+
+module.exports.listTableCities = (city) => {
+  const q = `SELECT * FROM users
+    JOIN signatures
+    ON signatures.user_id = users.id
+    JOIN user_profiles
+    ON user_profiles.user_id = users.id
+    WHERE $1 = user_profiles.city`;
+  const params = [city];
   return db.query(q, params);
 };
 

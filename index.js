@@ -55,7 +55,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   console.log("req.body: ", req.body);
-  console.log("passw", password);
+  // console.log("passw", password);
   hash(password)
     .then((hashedPassword) => {
       db.insertUsers(first, last, email, hashedPassword)
@@ -77,6 +77,39 @@ app.post("/register", (req, res) => {
     });
 });
 
+app.get("/profile", (req, res) => {
+  res.render("profile");
+});
+//argument userId we get from cookies
+app.post("/profile", (req, res) => {
+  const age = req.body.age;
+  const city = req.body.city;
+  const url = req.body.url;
+  const userId = req.session.userId;
+  console.log("req.session", req.session);
+  console.log("req.body: ", req.body);
+  db.userInfo(age, city, url, userId)
+    .then(() => {
+      //kopirao odozgo, proba 1
+      // const age = req.body.age;
+      // const city = req.body.city;
+      // const url = req.body.url;
+      // const userId = result.rows[0].id;
+      // console.log("result.rows", result.rows);
+      // // req.session.userId = result.rows[0].id;
+      // res.redirect("/petition");
+      // console.log("result.rows", result.rows);
+      // req.session.userId = result.rows[0].id;
+      res.redirect("/petition");
+    })
+    .catch((err) => {
+      console.log("error in insert user", err);
+      res.render("profile", {
+        err,
+      });
+    });
+});
+
 app.get("/login", (req, res) => {
   res.render("login");
 });
@@ -85,7 +118,7 @@ app.post("/login", (req, res) => {
   db.getPass(req.body.email)
     .then((result) => {
       const hashedPw = result.rows[0].password;
-      const password = req.body.pw;
+      const password = req.body.password; //promijenio iz pw u password
       const id = result.rows[0].id;
       compare(password, hashedPw)
         .then((matchValue) => {
@@ -93,18 +126,21 @@ app.post("/login", (req, res) => {
             req.session.userId = id;
             console.log("id", id);
             db.getSignature(req.session.userId)
-              .then((signature) => {
-                if (signature.rows[0]) {
-                  req.session.sigid = result.rows[0].id;
+              .then((signatures) => {
+                if (signatures.rows[0]) {
+                  //pazi na pisanje tu; promijenio u signatures, result-rows 1, jer mi je id 0
+                  req.session.sigid = result.rows[0].id; //tu nešto zeza; uspio c.logati id
                   res.redirect("/thankyou");
                 } else {
                   res.redirect("/petition");
                 }
               })
               .catch((error) => {
+                console.log("ERARRE", error);
                 res.render("login", { error });
               });
           } else {
+            console.log("error sloj vanka", error);
             res.render("login", { error: true });
           }
         })
@@ -119,34 +155,15 @@ app.post("/login", (req, res) => {
     });
 });
 
-app.get("/profile", (req, res) => {
-  res.render("profile");
-});
-
-app.post("/profile", (req, res) => {
-  const age = req.body.age;
-  const city = req.body.city;
-  const url = req.body.url;
-  console.log("req.body: ", req.body);
-});
-//poveži sa ovim gore i tablicom
-// db.userInfo(req.body)
-// .then(function (result) {
-//   console.log("Req.session: ", req.session);
-//   // console.log(result.rows);
-//   req.session.id = result.rows[0].id;
-//   console.log("to je req. ", req.session);
-//   res.redirect("/thankyou");
-// });
-
 app.get("/petition", (req, res) => {
   res.render("petition");
 });
 app.post("/petition", (req, res) => {
   const { sig } = req.body;
-  // console.log(req.body);
-  // console.log("req-session: ", req.session);
-  db.addSignature(sig)
+  const userId = req.session.userId;
+  console.log(req.body);
+  console.log("req-session: ", req.session);
+  db.addSignature(sig, userId) //dodao id u arg
     .then(function (result) {
       console.log("Req.session: ", req.session);
       // console.log(result.rows);
@@ -161,8 +178,34 @@ app.post("/petition", (req, res) => {
 });
 
 app.get("/thankyou", (req, res) => {
-  res.render("thankyou");
+  const userId = req.session.userId;
+  db.getSignature(userId).then((result) => {
+    console.log("result", result);
+    res.render("thankyou", { sig: result.rows[0].sig });
+  });
 });
+
+app.get("/signers", (req, res) => {
+  db.listTable().then((results) => {
+    // console.log("results", results.rows);
+    res.render("signers", {
+      userInfo: results.rows,
+    });
+  });
+});
+
+app.get("/signers/:city", (req, res) => {
+  console.log("req", req.params.city);
+  const city = req.params.city;
+  db.listTableCities(city).then((results) => {
+    // console.log("results", results.rows);
+    res.render("cities", {
+      userInfo: results.rows,
+    });
+  });
+});
+
+//NAPRAVI 2x CATCH (signers, city) !!!
 
 app.listen(process.env.PORT || 8080, () => console.log("hi server"));
 
