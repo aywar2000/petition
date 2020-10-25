@@ -1,0 +1,21 @@
+<h1>things have changed? update your profile</h1>
+
+<div>
+  <form method="POST">
+    <input name="first" placeholder="first name">
+    <input name="last"placeholder="last name">
+    <input name="email" placeholder="e-mail">
+    <input type="password" name="password" id="pw" placeholder="password">
+    <input name="age" placeholder="age">
+    <input name="city"placeholder="city">
+    <input name="url" placeholder="url">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <button id="reg-button">update</button>
+  </form>
+</div>
+<p><a href="signers">back </a>to signers list</p>
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}

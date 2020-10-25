@@ -4,7 +4,7 @@
 <a class="top-right" href="/logout">Log Out</a>
 <a class="top-right-middle" href="/signers">Signers</a>
 <div class="left">
-<div id="edit">Here is a list of signers from {{city}} who care about this as much as you do:</div>
+<div id="edit">people from {{city}} who care about this as much as you do:</div>
 </div>
 <div class="right">
  {{#userInfo}}
@@ -15,3 +15,9 @@
  {{/userInfo}} 
 </div>
  </div>
+
+ {{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}

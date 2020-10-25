@@ -186,26 +186,141 @@ app.get("/thankyou", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-  db.listTable().then((results) => {
-    // console.log("results", results.rows);
-    res.render("signers", {
-      userInfo: results.rows,
+  db.listTable()
+    .then((results) => {
+      // console.log("results", results.rows);
+      res.render("signers", {
+        userInfo: results.rows,
+      });
+    })
+    .catch((error) => {
+      res.render("thankyou", { error });
     });
-  });
 });
 
 app.get("/signers/:city", (req, res) => {
   console.log("req", req.params.city);
   const city = req.params.city;
-  db.listTableCities(city).then((results) => {
-    // console.log("results", results.rows);
-    res.render("cities", {
-      userInfo: results.rows,
+  db.listTableCities(city)
+    .then((results) => {
+      // console.log("results", results.rows);
+      res.render("cities", {
+        userInfo: results.rows,
+      });
+    })
+    .catch((error) => {
+      res.render("thankyou", { error });
     });
-  });
 });
 
-//NAPRAVI 2x CATCH (signers, city) !!!
+//EDIT PROFILE
+
+app.get("/profile/edit", (req, res) => {
+  const userId = req.session.userId;
+
+  db.userInfoToEdit(userId)
+    .then((results) => {
+      const first = results.rows[0].first;
+      const last = results.rows[0].last;
+      const email = results.rows[0].email;
+      const password = results.rows[0].password;
+      const age = results.rows[0].age;
+      const city = results.rows[0].city;
+      let url = results.rows[0].url;
+      if (!url.startsWith("http" || "https") && url != "") {
+        url = "http://" + url;
+      }
+
+      res.render("edit", {
+        first,
+        last,
+        email,
+        password,
+        age,
+        city,
+        url,
+      });
+    })
+    .catch((error) => {
+      res.render("edit", { error });
+    });
+});
+
+app.post("/profile/edit", (req, res) => {
+  let newPassword = req.body.password;
+  let first = req.body.first;
+  let last = req.body.last;
+  let email = req.body.email;
+  let userId = req.session.userId;
+  let age = req.body.age;
+  let city = req.body.city.toUpperCase();
+  let url = req.body.url;
+
+  if (newPassword == "") {
+    db.updateWithOldPw(first, last, email, userId)
+      .then(() => {
+        if (!url.startsWith("http" || "https") && url != "") {
+          url = "http://" + url;
+        }
+        db.updateUserProfile(age, city, url, userId)
+          .then(() => {
+            res.redirect("/petition"); //proba, bilo /profile/edit
+          })
+          .catch((error) => {
+            res.render("edit", { error });
+          });
+      })
+      .catch((error) => {
+        res.render("edit", { error });
+      });
+  } else {
+    hash(newPassword)
+      .then((hashedPw) => {
+        db.updateWithNewPw(first, last, email, hashedPw, userId)
+          .then(() => {
+            if (!url.startsWith("http" || "https") && url != "") {
+              url = "http://" + url;
+            }
+            db.updateUserProfiles(age, city, url, userId)
+              .then(() => {
+                res.redirect("/petition"); //proba, bilo /profile/edit
+              })
+              .catch((error) => {
+                res.render("edit", { error });
+              });
+          })
+          .catch((error) => {
+            res.render("edit", { error });
+          });
+      })
+      .catch(() => {
+        res.render("edit", { error: true });
+      });
+  }
+});
+
+//DELETE SIGNATURE
+// app.post("thankyou", (req, res) => {
+//   sig.id =
+// })
+app.delete("/delete/signature", (req, res) => {
+  const { id } = req.params;
+  if (req.session.user.signatureId == id) {
+    db.deleteSignature(id)
+      .then(() => {
+        delete req.session.user.signatureId;
+        res.redirect("/petition");
+      })
+      .catch((err) => {
+        console.log("error in delete req", err);
+      });
+  }
+});
+
+app.get("/logout", (req, res) => {
+  req.session = null;
+  res.redirect("/");
+});
 
 app.listen(process.env.PORT || 8080, () => console.log("hi server"));
 

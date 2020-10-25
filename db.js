@@ -65,6 +65,49 @@ module.exports.listTableCities = (city) => {
   return db.query(q, params);
 };
 
+module.exports.userInfoToEdit = (userId) => {
+  const q = `SELECT * FROM users
+    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE user_profiles.user_id=$1`;
+  const params = [userId];
+  return db.query(q, params);
+};
+
+module.exports.updateWithOldPw = (first, last, email, userId) => {
+  const q = `UPDATE users
+    SET first=$1, last=$2, email=$3
+    WHERE id=$4
+    RETURNING *`;
+  const params = [first, last, email, userId];
+  return db.query(q, params);
+};
+
+module.exports.updateUserProfile = (age, city, url, userId) => {
+  const q = `INSERT INTO user_profiles (age, city, url, user_id)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (user_id)
+    DO UPDATE SET age=$1, city=$2, url=$3
+    RETURNING *`;
+  const params = [age, city, url, userId];
+  return db.query(q, params);
+};
+
+module.exports.updateWithNewPw = (first, last, email, password, userId) => {
+  const q = `UPDATE users
+    SET first=$1, last=$2, email=$3, password=$4
+    WHERE id=$5
+    RETURNING *`;
+  const params = [first, last, email, password, userId];
+  return db.query(q, params);
+};
+
+exports.deleteSignature = (id) => {
+  const q = `DELETE FROM signatures
+             WHERE id = $1`;
+  const params = [id];
+  return db.query(q, params);
+};
+
 // onda s time mailom u db.js napises query koji ti vraca id i password
 // od user where email je jednak onome sto si mu dao kao argument
 

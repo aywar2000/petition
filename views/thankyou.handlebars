@@ -1,2 +1,15 @@
 <h1> thank you for signing!</h1>
 <img height="200px" src="{{sig}}"/>
+
+<form method='POST' action='/delete/signature'>
+<button id="de-button">delete signature</button>
+</form>
+<h3>list of other<a href="signers"> signers</a></h3>
+
+<img src="img-2.jpg"/>
+
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}

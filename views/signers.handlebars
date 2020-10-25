@@ -1,17 +1,18 @@
 <div class="container">
-<a class="top-left" href="/profile/edit">Edit Profile</a>
-<a class="top-left-middle" href="/">Petition</a>
-<a class="top-right" href="/logout">Log Out</a>
+<a href="/profile/edit">Edit Profile</a>
+<a href="/">Petition</a>
+<a href="/logout">Log Out</a>
 <div class="left">
    
-<div>Here is a list of {{number}} people who care about this as much as you do:</div>
+<div>Here is a list of {{number}} people who care about these animals as much as you do:</div>
 
 </div>
 <div>
  {{#userInfo}}
 
-<div>
+<div class="signers">
     {{#if url}}<a class="link" href="{{url}}">{{first}} {{last}}</a> {{else}} {{first}} {{last}}{{/if}}  {{age}}  <a class="link" href="/signers/{{city}}">{{city}}</a>
+    <img height="200px" src="{{sig}}"/>
 </div>
 
 
@@ -19,3 +20,9 @@
  </div>
 
 </div>
+
+{{#if err}}
+<div>
+  <h3 id="error-log">there was an error</h3>
+</div>
+{{/if}}
